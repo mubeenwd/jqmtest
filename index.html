@@ -17,10 +17,12 @@
         document.addEventListener("deviceReady", deviceReady, false);
 
         function deviceReady() {
+            alert("deviceReady");
             deviceReadyDeferred.resolve();
         }
 
         $(document).on("mobileinit", function () {
+            alert("mobileinit");
             jqmReadyDeferred.resolve();
         });
 
