@@ -11,26 +11,13 @@
     <script type="text/javascript" src="phonegap.js"></script>
     <link rel="stylesheet" href="css/app.css" type="text/css">
     <script type="text/javascript">
-        var deviceReadyDeferred = $.Deferred();
-        var jqmReadyDeferred = $.Deferred();
 
         document.addEventListener("deviceReady", deviceReady, false);
 
         function deviceReady() {
-            alert("deviceReady");
-            deviceReadyDeferred.resolve();
+            showMessage('deviceReady');
         }
 
-        $(document).on("mobileinit", function () {
-            alert("mobileinit");
-            jqmReadyDeferred.resolve();
-        });
-
-        $.when(deviceReadyDeferred, jqmReadyDeferred).then(doWhenBothFrameworksLoaded);
-
-        function doWhenBothFrameworksLoaded() {
-            alert("Both framework loaded");
-        }
     </script>
 </head>
 <body>
