@@ -5,27 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
     <link rel="stylesheet" href="css/jquery.mobile.squareui.css" type="text/css">
-    <link rel="stylesheet" href="idangerous/idangerous.swiper.css" type="text/css">
+    <link rel="stylesheet" href="spinner/waitMe.min.css" type="text/css">
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script type="text/javascript" src="js/jquery.mobile-1.4.0.min.js"></script>
-    <script type="text/javascript" src="idangerous/idangerous.swiper.min.js"></script>
+    <script type="text/javascript" src="spinner/waitMe.min.js"></script>
     <script type="text/javascript" src="phonegap.js"></script>
     <link rel="stylesheet" href="css/app.css" type="text/css">
     <script type="text/javascript">
-
-        $(function () {
-            var mySwiper = new Swiper('.swiper-container', {
-                pagination: '.pagination',
-                paginationClickable: true,
-                loop: true
-            });
-        });
+        
+        var configurations = { FileCount: 19, PageSize: 50 };
 
         document.addEventListener("deviceReady", deviceReady, false);
 
         function deviceReady() {
-            showMessage('deviceReady');
+            try {
+                CheckDbStatus();
+            } catch (e) {
+                showMessage(e);
+            }
         }
 
     </script>
@@ -33,7 +31,7 @@
 <body>
     <div data-role="page" id="home" data-theme="f">
         <div data-role="header">
-            <a id="btn-fav" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="btn-fav" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
@@ -45,7 +43,7 @@
                 <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #008299; height: 150px;
                         text-align: center;">
-                        <a href="index.html#SurnameSarch" data-transition="slide">
+                        <a href="#SurnameSarch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -62,7 +60,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #8C0095; height: 150px;
                         text-align: center;">
-                        <a href="index.html#SurnameSarch" data-transition="slide">
+                        <a href="#SurnameSarch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -81,7 +79,7 @@
                 <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #AC193D; height: 150px;
                         text-align: center;">
-                        <a href="index.html#FatherNameSearch" data-transition="slide">
+                        <a href="#FatherNameSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -98,7 +96,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #006AC1; height: 150px;
                         text-align: center;">
-                        <a href="index.html#HouseNoSearch" data-transition="slide">
+                        <a href="#HouseNoSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -117,7 +115,7 @@
                 <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #5133AB; height: 150px;
                         text-align: center;">
-                        <a href="index.html#AgewiseSearch" data-transition="slide">
+                        <a href="#AgewiseSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -134,7 +132,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #D24726; height: 150px;
                         text-align: center;">
-                        <a href="index.html#VoterIdSearch" data-transition="slide">
+                        <a href="#VoterIdSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -150,10 +148,10 @@
                         </a>
                     </td>
                 </tr>
-                 <tr>
+                <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #AA40FF; height: 150px;
                         text-align: center;">
-                        <a href="index.html#AgewiseSearch" data-transition="slide">
+                        <a href="#AgewiseSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -170,7 +168,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #1FAEFF; height: 150px;
                         text-align: center;">
-                        <a href="index.html#VoterIdSearch" data-transition="slide">
+                        <a href="#VoterIdSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -186,10 +184,10 @@
                         </a>
                     </td>
                 </tr>
-                 <tr>
+                <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #C35D15; height: 150px;
                         text-align: center;">
-                        <a href="index.html#AgewiseSearch" data-transition="slide">
+                        <a href="#AgewiseSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -206,7 +204,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #83BA1F; height: 150px;
                         text-align: center;">
-                        <a href="index.html#VoterIdSearch" data-transition="slide">
+                        <a href="#VoterIdSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -223,44 +221,49 @@
                     </td>
                 </tr>
             </table>
-            <!--<div class="swiper-container">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        
-                    </div>
-                    <div class="swiper-slide">
-                        <table style="width: 100%;">
-                            <tr>
-                                <td style="width: 50%; border: solid 1px silver; background-color: #008299; height: 150px;">
-                                </td>
-                                <td style="width: 50%; border: solid 1px silver; background-color: #8C0095; height: 150px;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%; border: solid 1px silver; background-color: #AC193D; height: 150px;">
-                                </td>
-                                <td style="width: 50%; border: solid 1px silver; background-color: #006AC1; height: 150px;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%; border: solid 1px silver; background-color: #5133AB; height: 150px;">
-                                </td>
-                                <td style="width: 50%; border: solid 1px silver; background-color: #D24726; height: 150px;">
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="pagination">
-                    </div>
-                </div>
-            </div>-->
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="NameSearch">
+    <div data-role="page" id="UpdateDb" data-theme="f">
+        <div data-role="header">
+            <a id="A22" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            </a>
+            <h1>
+                सरकार - २०१४</h1>
+            <a id="A23" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
+            </a>
+        </div>
+        <div data-role="content">
+            <h3>
+                Database Update</h3>
+            <p>
+                Application needs to be updated before start searching, Please click below to start
+                updation</p>
+            <p>
+                It may take several minutes to accomplish updations, (Usualy 15-20 minutes but still
+                depends upon on your device processing speed)</p>
+            <a href="#" data-role="button" data-inline="true" data-theme="d" onclick="StartUpdatingApp();">
+                Click to Start Updating Application</a>
+            <div id="progressBar" style="display: none;">
+                <p>
+                    Please wait while application updating it self before you start working with it,
+                    it should up to date</p>
+                <p style="padding: 10px;">
+                    <meter id="meter" value="0" max="20" high="15" low="10"></meter>
+                </p>
+                <p id="logger" style="border: solid 1px silver; padding: 2px;">
+                </p>
+            </div>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <h1>
+                उमेदवार नाव</h1>
+        </div>
+    </div>
+    <div data-role="page" id="NameSearch" data-theme="f">
         <div data-role="header">
             <a id="A2" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
             <h1>
@@ -275,7 +278,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="SurnameSarch">
+    <div data-role="page" id="SurnameSarch" data-theme="f">
         <div data-role="header">
             <a id="A4" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
             <h1>
@@ -290,7 +293,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="FatherNameSearch">
+    <div data-role="page" id="FatherNameSearch" data-theme="f">
         <div data-role="header">
             <a id="A6" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
             <h1>
@@ -305,7 +308,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="HouseNoSearch">
+    <div data-role="page" id="HouseNoSearch" data-theme="f">
         <div data-role="header">
             <a id="A8" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
             <h1>
@@ -320,7 +323,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="AgewiseSearch">
+    <div data-role="page" id="AgewiseSearch" data-theme="f">
         <div data-role="header">
             <a id="A10" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
             </a>
@@ -336,7 +339,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="VoterIdSearch">
+    <div data-role="page" id="VoterIdSearch" data-theme="f">
         <div data-role="header">
             <a id="A12" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
             </a>
@@ -352,7 +355,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="PartwiseList">
+    <div data-role="page" id="PartwiseList" data-theme="f">
         <div data-role="header">
             <a id="A14" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
             </a>
@@ -368,7 +371,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="SurnameList">
+    <div data-role="page" id="SurnameList" data-theme="f">
         <div data-role="header">
             <a id="A16" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
             </a>
@@ -384,7 +387,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="PollingStations">
+    <div data-role="page" id="PollingStations" data-theme="f">
         <div data-role="header">
             <a id="A18" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
             </a>
@@ -400,7 +403,7 @@
                 उमेदवार नाव</h1>
         </div>
     </div>
-    <div data-role="page" id="AgewiseList">
+    <div data-role="page" id="AgewiseList" data-theme="f">
         <div data-role="header">
             <a id="A20" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
             </a>
