@@ -25,11 +25,11 @@ function CheckDbStatus() {
                 if (res.rows.length > 0) {
                     if (res.rows.item(0).cnt > 1) {
 
-                        $.mobile.changePage("#home", {
-                            transition: "slide",
-                            reverse: true,
-                            changeHash: true
-                        });
+//                        $.mobile.changePage("#home", {
+//                            transition: "slide",
+//                            reverse: true,
+//                            changeHash: true
+//                        });
 
                         $('.ionic-body').waitMe('hide');
                     }
