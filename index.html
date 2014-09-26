@@ -13,8 +13,10 @@
     <script type="text/javascript" src="phonegap.js"></script>
     <link rel="stylesheet" href="css/app.css" type="text/css">
     <script type="text/javascript">
-        
-        var configurations = { FileCount: 19, PageSize: 50 };
+
+        var configurations = { FileCount: 20, PageSize: 50 };
+
+        var nameSearchHolder = { VPartNo: 0, VName: '', VPageNo: 1, VAction: 0 };
 
         document.addEventListener("deviceReady", deviceReady, false);
 
@@ -26,6 +28,49 @@
             }
         }
 
+        $(document).delegate("#NameSearch", "pageshow", function () {
+            fillPartDropdown('ddlNameSearchPartNo');
+        });
+
+        $(document).delegate("#SurnameSarch", "pageshow", function () {
+            fillPartDropdown('ddlSurnameSearchPartNo');
+        });
+
+        $(document).delegate("#FatherNameSearch", "pageshow", function () {
+            fillPartDropdown('ddlFatherSearchPartNo');
+        });
+
+        $(document).delegate("#HouseNoSearch", "pageshow", function () {
+            fillPartDropdown('ddlHouseNoSearchPartNo');
+        });
+
+        $(document).delegate("#AgewiseSearch", "pageshow", function () {
+            fillPartDropdown('ddlAgewiseSearchPartNo');
+        });
+
+        $(document).delegate("#VoterIdSearch", "pageshow", function () {
+            fillPartDropdown('ddlVoteIdNoSearchPartNo');
+        });
+
+        $(document).delegate("#PartwiseList", "pageshow", function () {
+            PartwiseGroupByList("PartwiseListContainer");
+        });
+
+        $(document).delegate("#nameSearchResult", "pageshow", function () {
+            BuildSearchResult(1);
+        });
+
+        $(document).delegate("#PollingStations", "pageshow", function () {
+            PollingStations('PollingStationsContainer');
+        });
+
+        $(document).delegate("#SurnameList", "pageshow", function () {
+            SurnameListGroup('SurnameListContainer');
+        });
+
+        $(document).delegate("#AgewiseList", "pageshow", function () {
+            AgewiseeListGroup('AgewiseListContainer');
+        });
     </script>
 </head>
 <body>
@@ -35,15 +80,15 @@
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A1" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A1" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #008299; height: 150px;
                         text-align: center;">
-                        <a href="#SurnameSarch" data-transition="slide">
+                        <a href="#NameSearch" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -151,7 +196,7 @@
                 <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #AA40FF; height: 150px;
                         text-align: center;">
-                        <a href="#AgewiseSearch" data-transition="slide">
+                        <a href="#PartwiseList" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -168,7 +213,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #1FAEFF; height: 150px;
                         text-align: center;">
-                        <a href="#VoterIdSearch" data-transition="slide">
+                        <a href="#PollingStations" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -187,7 +232,7 @@
                 <tr>
                     <td style="width: 50%; border: solid 1px silver; background-color: #C35D15; height: 150px;
                         text-align: center;">
-                        <a href="#AgewiseSearch" data-transition="slide">
+                        <a href="#AgewiseList" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -204,7 +249,7 @@
                     </td>
                     <td style="width: 50%; border: solid 1px silver; background-color: #83BA1F; height: 150px;
                         text-align: center;">
-                        <a href="#VoterIdSearch" data-transition="slide">
+                        <a href="#SurnameList" data-transition="slide">
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
@@ -213,7 +258,7 @@
                                 </tr>
                                 <tr>
                                     <td style="color: White;">
-                                        मतदान केंद्र यादी
+                                        आडनाव यादी
                                     </td>
                                 </tr>
                             </table>
@@ -229,12 +274,12 @@
     </div>
     <div data-role="page" id="UpdateDb" data-theme="f">
         <div data-role="header">
-            <a id="A22" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A22" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A23" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A23" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
             <h3>
@@ -245,14 +290,11 @@
             <p>
                 It may take several minutes to accomplish updations, (Usualy 15-20 minutes but still
                 depends upon on your device processing speed)</p>
-            <a href="#" data-role="button" data-inline="true" data-theme="d" onclick="StartUpdatingApp();">
-                Click to Start Updating Application</a>
+            <a href="#" data-role="button" data-inline="true" data-theme="d" id="btnUpdateButton"
+                onclick="StartUpdatingApp();">Click to Start Updating Application</a>
             <div id="progressBar" style="display: none;">
-                <p>
-                    Please wait while application updating it self before you start working with it,
-                    it should up to date</p>
                 <p style="padding: 10px;">
-                    <meter id="meter" value="0" max="20" high="15" low="10"></meter>
+                    <meter id="meter" value="0" min="0" max="100" high="80" low="40"></meter>
                 </p>
                 <p id="logger" style="border: solid 1px silver; padding: 2px;">
                 </p>
@@ -265,13 +307,31 @@
     </div>
     <div data-role="page" id="NameSearch" data-theme="f">
         <div data-role="header">
-            <a id="A2" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
+            <a id="A2" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
+            </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A3" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A3" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Search Voter By Name</h3>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlNameSearchPartNo" class="select">
+                    Select Part:</label>
+                <select name="ddlNameSearchPartNo" id="ddlNameSearchPartNo" data-theme="c">
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtNameSearchVoterName" class="select">
+                    Voter Name:</label>
+                <input type="text" name="txtNameSearchVoterName" id="txtNameSearchVoterName" placeholder="Voter Name" />
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <a href="#" class="ui-btn data" id="btnNameSearchSubmit" name="btnNameSearchSubmit"
+                    onclick="PerformSearch(1);">Search</a>
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -280,13 +340,31 @@
     </div>
     <div data-role="page" id="SurnameSarch" data-theme="f">
         <div data-role="header">
-            <a id="A4" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
+            <a id="A4" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
+            </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A5" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A5" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Search Voter By Surname</h3>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlSurnameSearchPartNo" class="select">
+                    Select Part:</label>
+                <select name="ddlSurnameSearchPartNo" id="ddlSurnameSearchPartNo" data-theme="c">
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtSurnameSearchSurname" class="select">
+                    Voter's Surname Name:</label>
+                <input type="text" name="txtSurnameSearchSurname" id="txtSurnameSearchSurname" placeholder="Voter's Surname" />
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <a href="#" class="ui-btn data" id="btnSurnameSearchSubmit" onclick="PerformSearch(2);"
+                    name="btnSurnameSearchSubmit">Search</a>
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -295,13 +373,32 @@
     </div>
     <div data-role="page" id="FatherNameSearch" data-theme="f">
         <div data-role="header">
-            <a id="A6" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
+            <a id="A6" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
+            </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A7" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A7" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Search Voter By Father's Name</h3>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlFatherameSearchPartNo" class="select">
+                    Select Part:</label>
+                <select name="ddlFatherSearchPartNo" id="ddlFatherSearchPartNo" data-theme="c">
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtFatherSearchFatherName" class="select">
+                    Voter's Father Name:</label>
+                <input type="text" name="txtFatherSearchFatherName" id="txtFatherSearchFatherName"
+                    placeholder="Voter's Father Name" />
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <a href="#" class="ui-btn data" id="btnFatherSearchSubmit" onclick="PerformSearch(3);"
+                    name="btnFatherSearchSubmit">Search</a>
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -310,13 +407,31 @@
     </div>
     <div data-role="page" id="HouseNoSearch" data-theme="f">
         <div data-role="header">
-            <a id="A8" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext"></a>
+            <a id="A8" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
+            </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A9" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A9" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Search Voter By House No</h3>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlHouseNoSearchPartNo" class="select">
+                    Select Part:</label>
+                <select name="ddlHouseNoSearchPartNo" id="ddlHouseNoSearchPartNo" data-theme="c">
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtHouseNoSearchHouseNo" class="select">
+                    Voter's House No:</label>
+                <input type="text" name="txtHouseNoSearchHouseNo" id="txtHouseNoSearchHouseNo" placeholder="Voter's House No" />
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <a href="#" class="ui-btn data" id="btnHouseNoSearch" onclick="PerformSearch(4);"
+                    name="btnHouseNoSearch">Search</a>
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -325,14 +440,54 @@
     </div>
     <div data-role="page" id="AgewiseSearch" data-theme="f">
         <div data-role="header">
-            <a id="A10" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A10" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A11" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A11" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Agewise Search</h3>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlAgewiseSearchPartNo" class="select">
+                    Select Part:</label>
+                <select name="ddlAgewiseSearchPartNo" id="ddlAgewiseSearchPartNo" data-theme="c">
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlAgewiseAgeFrom" class="select">
+                    Select From:</label>
+                <select name="ddlAgewiseAgeFrom" id="ddlAgewiseAgeFrom" data-theme="c">
+                    <option value="18">18</option>
+                    <option value="25">25</option>
+                    <option value="35">35</option>
+                    <option value="35">45</option>
+                    <option value="35">65</option>
+                    <option value="35">75</option>
+                    <option value="35">85</option>
+                    <option value="35">100</option>
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlAgewiseAgeTo" class="select">
+                    Select To:</label>
+                <select name="ddlAgewiseAgeTo" id="ddlAgewiseAgeTo" data-theme="c">
+                    <option value="18">18</option>
+                    <option value="25">25</option>
+                    <option value="35">35</option>
+                    <option value="35">45</option>
+                    <option value="35">65</option>
+                    <option value="35">75</option>
+                    <option value="35">85</option>
+                    <option value="35">100</option>
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <a href="#" class="ui-btn data" id="btnAgewiseSearch" onclick="PerformSearch(5);"
+                    name="btnAgewiseSearch">Search</a>
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -341,14 +496,32 @@
     </div>
     <div data-role="page" id="VoterIdSearch" data-theme="f">
         <div data-role="header">
-            <a id="A12" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A12" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A13" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A13" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Search Voter By Voter Id</h3>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="ddlVoteIdNoSearchPartNo" class="select">
+                    Select Part:</label>
+                <select name="ddlVoteIdNoSearchPartNo" id="ddlVoteIdNoSearchPartNo" data-theme="c">
+                </select>
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtVoteIdNoSearchVoterId" class="select">
+                    Voter Id:</label>
+                <input type="text" name="txtVoteIdNoSearchVoterId" id="txtVoteIdNoSearchVoterId"
+                    placeholder="Voter ID" />
+            </div>
+            <div data-role="fieldcontain" class="ui-hide-label">
+                <a href="#" class="ui-btn data" id="btnVoteIdNoSearch" onclick="PerformSearch(6);"
+                    name="btnVoteIdNoSearch">Search</a>
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -357,14 +530,18 @@
     </div>
     <div data-role="page" id="PartwiseList" data-theme="f">
         <div data-role="header">
-            <a id="A14" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A14" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A15" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A15" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Partwise List</h3>
+            <div id="PartwiseListContainer">
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -373,14 +550,18 @@
     </div>
     <div data-role="page" id="SurnameList" data-theme="f">
         <div data-role="header">
-            <a id="A16" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A16" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A17" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A17" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Surname and their Vooters</h3>
+            <div id="SurnameListContainer">
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -389,14 +570,16 @@
     </div>
     <div data-role="page" id="PollingStations" data-theme="f">
         <div data-role="header">
-            <a id="A18" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A18" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A19" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A19" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <div id="PollingStationsContainer">
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
@@ -405,14 +588,59 @@
     </div>
     <div data-role="page" id="AgewiseList" data-theme="f">
         <div data-role="header">
-            <a id="A20" data-icon="grid" class="ui-btn-left" href="#" data-iconpos="notext">
+            <a id="A20" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
             </a>
             <h1>
                 सरकार - २०१४</h1>
-            <a id="A21" data-icon="delete" class="ui-btn-right" href="#" data-iconpos="notext">
-            </a>
+            <a id="A21" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
         </div>
         <div data-role="content">
+            <h3>
+                Agewise List</h3>
+            <div id="AgewiseListContainer">
+            </div>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <h1>
+                उमेदवार नाव</h1>
+        </div>
+    </div>
+    <div data-role="page" id="nameSearchResult" data-theme="f">
+        <div data-role="header">
+            <a id="A24" data-icon="grid" class="ui-btn-left" href="#home" data-iconpos="notext">
+            </a>
+            <h1>
+                सरकार - २०१४</h1>
+            <a id="A25" data-icon="delete" class="ui-btn-right" href="#" onclick="navigator.app.exitApp();"
+                data-iconpos="notext"></a>
+        </div>
+        <div data-role="content">
+            <div style="margin-top: -10px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 25%;">
+                            <button type="button" id="anchPrevious" data-icon="arrow-l" data-theme="c" style="padding-top: 25px;">
+                            </button>
+                        </td>
+                        <td style="width: 50%;">
+                            <button type="button" data-theme="c" style="padding: 0;">
+                                <label id="lblPageNo" style="font-size: 11px;">
+                                </label>
+                                <label id="lblPageCounter" style="font-size: 11px;">
+                                </label>
+                            </button>
+                        </td>
+                        <td style="width: 25%;">
+                            <button type="button" id="anchNext" data-icon="arrow-r" data-iconpos="right" data-theme="c"
+                                style="padding-top: 25px;">
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="nameSearchResultContainer">
+            </div>
         </div>
         <div data-role="footer" data-position="fixed">
             <h1>
