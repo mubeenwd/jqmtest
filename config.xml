@@ -6,16 +6,16 @@
         id        = "com.mubeen.jqmtest"
         version   = "1.0.0">
 
-    <name>JQM Test</name>
+    <name>Sarkar2104</name>
 
     <description>
-        Application for JQM Test
+      Application for Sarkar Vidhansabha Election 2014
     </description>
 
     <author href="http://mubeen.in" email="mubeeavailable@gmail.com">
         Shaikh Mubeen
     </author>
-
+    
     <!--
         If you do not want any permissions to be added to your app, add the
         following tag to your config.xml; you will still have the INTERNET
