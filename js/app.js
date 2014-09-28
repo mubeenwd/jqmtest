@@ -26,6 +26,7 @@ function CheckDbStatus() {
             tx.executeSql("SELECT count(VoterId) as cnt FROM Voters;", [], function (tx, res) {
                 if (res.rows.length > 0) {
                     if (res.rows.item(0).cnt > 1) {
+                        
                         $('div[data-role="content"]').waitMe('hide');
                     }
                     else {
@@ -253,12 +254,12 @@ function PartwiseGroupByList(partwiseContainer) {
 
 function PerformSearch(VAction) {
     try {
-
+        
         switch (VAction) {
             case 1:
                 {
                     if ($("#txtNameSearchVoterName").val() != '') {
-
+                        
                         nameSearchHolder.VPartNo = $("#ddlNameSearchPartNo").val();
                         nameSearchHolder.VName = $("#txtNameSearchVoterName").val();
                         nameSearchHolder.VPageNo = 1;
@@ -376,9 +377,34 @@ function PerformSearch(VAction) {
                     }
                     break;
                 }
+            case 7:
+                {
+                    fullNameSearchHolder.VPartNo = $("#ddlFullNameSearchPartNo").val();
+                    fullNameSearchHolder.VFirstName = $("#txtFullNameSearchVoterName").val();
+                    fullNameSearchHolder.VMiddleName = $("#txtFullNameSearchMiddleName").val();
+                    fullNameSearchHolder.VLastName = $("#txtFullNameSearchLastName").val();
+                    fullNameSearchHolder.VPageNo = 1;
+                    fullNameSearchHolder.VAction = 7;
+                    nameSearchHolder.VAction = 7;
+
+                    if ((fullNameSearchHolder.VFirstName + fullNameSearchHolder.VMiddleName + fullNameSearchHolder.VLastName) != '') {
+                        $.mobile.changePage("#nameSearchResult", {
+                            transition: "slide",
+                            reverse: true,
+                            changeHash: true
+                        });
+                    }
+                    else {
+                        showMessage("Please provide atleast on name");
+                        return false;
+                    }
+                    break;
+                }
             default:
                 break;
         }
+
+        $("#nameSearchResultContainer").html('');
     } catch (e) {
         showMessage(e);
         return false;
@@ -408,7 +434,7 @@ function BuildSearchResult(VPageNo) {
         switch (nameSearchHolder.VAction) {
             case 1:
                 {
-                    searchTypeCondition = 'Fname';
+                    searchTypeCondition = 'Ename';
                     break;
                 }
             case 2:
@@ -447,14 +473,14 @@ function BuildSearchResult(VPageNo) {
             if (parseInt(ageFrom) > 0 && parseInt(ageTo) > 0) {
                 if (nameSearchHolder.VPartNo != '') {
                     if (parseInt(nameSearchHolder.VPartNo) > 0) {
-                        strCondition = " WHERE PartNo = '" + partNo + "' AND ";
+                        strCondition = " WHERE PartNo = '" + nameSearchHolder.VPartNo + "' AND ";
                     }
                     else {
-                        strCondition += " WHERE "
+                        strCondition += " WHERE ";
                     }
                 }
                 else {
-                    strCondition += " WHERE "
+                    strCondition += " WHERE ";
                 }
 
                 strCondition += "Age BETWEEN " + ageFrom + " AND " + ageTo;
@@ -464,11 +490,51 @@ function BuildSearchResult(VPageNo) {
                 return false;
             }
         }
+        else if (nameSearchHolder.VAction == 7) {
+            
+            if (fullNameSearchHolder.VPartNo != '') {
+                if (parseInt(fullNameSearchHolder.VPartNo) > 0) {
+                    strCondition += " WHERE PartNo = '" + fullNameSearchHolder.VPartNo + "'";
+                }
+                else {
+                    strCondition += " WHERE ";
+                }
+            }
+            else {
+                strCondition += " WHERE ";
+            }
+
+            if (fullNameSearchHolder.VFirstName != '') {
+                strCondition += "Fname like '%" + fullNameSearchHolder.VFirstName + "%' AND ";
+            }
+
+            if (fullNameSearchHolder.VMiddleName != '') {
+                strCondition += "RlnName like '%" + fullNameSearchHolder.VMiddleName + "%' AND ";
+            }
+            else {
+                if (fullNameSearchHolder.VFirstName!='') {
+                    strCondition = strCondition.substring(0, strCondition.length - 5);
+                }
+            }
+
+            if (fullNameSearchHolder.VLastName != '') {
+                strCondition += "Lname like '%" + fullNameSearchHolder.VLastName + "%' ";
+            }
+            else {
+                if (fullNameSearchHolder.VFirstName != '') {
+                    if (fullNameSearchHolder.VMiddleName != '') {
+                        strCondition = strCondition.substring(0, strCondition.length - 5);
+                    }
+                }
+            }
+
+            nameSearchHolder.VPageNo = fullNameSearchHolder.VPageNo;
+        }
         else {
 
             if (nameSearchHolder.VPartNo != '') {
                 if (parseInt(nameSearchHolder.VPartNo) > 0) {
-                    strCondition += " WHERE PartNo = '" + vPartNo + "'";
+                    strCondition += " WHERE PartNo = '" + nameSearchHolder.VPartNo + "'";
                 }
             }
 
@@ -486,15 +552,18 @@ function BuildSearchResult(VPageNo) {
                 }
 
                 if (nameSearchHolder.VAction == 4) {
-                    strCondition += searchTypeCondition + " = '" + nameSearchHolder.VName + "'";
+                    if (nameSearchHolder.VHouseSurName != '') {
+                        strCondition += searchTypeCondition + " = '" + nameSearchHolder.VName + "' AND RlnName = '" + nameSearchHolder.VHouseSurName + "'";
+                    }
+                    else {
+                        strCondition += searchTypeCondition + " = '" + nameSearchHolder.VName + "'";
+                    }
                 }
                 else {
                     strCondition += searchTypeCondition + " LIKE '%" + nameSearchHolder.VName + "%'";
                 }
             }
         }
-
-        strCommand += strCondition + ' LIMIT ' + nameSearchHolder.VPageNo + ', 50';
 
         var countComman = 'SELECT COUNT(VoterId) as cnt FROM Voters' + strCondition;
 
@@ -505,46 +574,75 @@ function BuildSearchResult(VPageNo) {
                 try {
                     tx.executeSql(countComman, [],
                         function (tx, resCount) {
-                            
+
                             var getCount = resCount.rows.item(0).cnt;
-                            
+
                             if (getCount > 0) {
+
+                                if (getCount > 50) {
+                                    strCommand += strCondition + ' ORDER BY VoterId LIMIT ' + nameSearchHolder.VPageNo + ', 50;';
+                                }
+                                else {
+                                    strCommand += strCondition;
+                                }
 
                                 SetPaging(50, getCount, nameSearchHolder.VPageNo, nameSearchHolder.VAction);
 
                                 tx.executeSql(strCommand, [], function (tx, res) {
+
                                     FillList(res);
                                     $('div[data-role="content"]').waitMe('hide');
                                 }, function (e) {
                                     $('div[data-role="content"]').waitMe('hide');
                                     showMessage("tx.executeSql ERROR: " + e.message);
+                                    $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+                                    $("#lblPageCounter").text("0 - 0 of 0");
+                                    $("#lblPageNo").text("Page # 1");
                                 });
                             }
                             else {
                                 $('div[data-role="content"]').waitMe('hide');
+                                $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+                                $("#lblPageCounter").text("0 - 0 of 0");
+                                $("#lblPageNo").text("Page # 1");
                             }
                         }
                         , function (e) {
                             $('div[data-role="content"]').waitMe('hide');
                             showMessage("tx.executeSql ERROR: " + e.message);
+                            $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+                            $("#lblPageCounter").text("0 - 0 of 0");
+                            $("#lblPageNo").text("Page # 1");
                         });
 
                 } catch (e) {
                     $('div[data-role="content"]').waitMe('hide');
                     showMessage("db.executeSql catch block ERROR: " + e.message);
+                    $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+                    $("#lblPageCounter").text("0 - 0 of 0");
+                    $("#lblPageNo").text("Page # 1");
                 }
             }, function (e) {
                 $('div[data-role="content"]').waitMe('hide');
                 showMessage("db.transaction ERROR: " + e.message);
+                $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+                $("#lblPageCounter").text("0 - 0 of 0");
+                $("#lblPageNo").text("Page # 1");
             });
         }
         else {
             $('div[data-role="content"]').waitMe('hide');
             showMessage("Db not created<br/>");
+            $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+            $("#lblPageCounter").text("0 - 0 of 0");
+            $("#lblPageNo").text("Page # 1");
         }
     } catch (e) {
         $('div[data-role="content"]').waitMe('hide');
         showMessage("Error building search result " + JSON.stringify(e));
+        $("#nameSearchResultContainer").html('<p style="color:red;">Sorry, no record found for your search, please try diffrent search options.</p>');
+        $("#lblPageCounter").text("0 - 0 of 0");
+        $("#lblPageNo").text("Page # 1");
     }
 }
 
@@ -557,54 +655,52 @@ function FillList(results) {
 
             for (var i = 0; i < results.rows.length; i++) {
                 row = results.rows.item(i);
-                
-                strHtmlLit += '<table style="width:100%;border-collapse:collapse;border:solid 1px #4617B4;padding:2px;">';
+
+                strHtmlLit += '<table style="width:100%;border-collapse:collapse;border:solid 1px #999999;padding:2px;">';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;" colspan="2">' + row.Mname + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;" colspan="2">' + row.Mname + '</td>';
                 strHtmlLit += '</tr>';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;">लिंग</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #4617B4;padding:2px;">' + row.Gender + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">लिंग</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:2px;">' + row.Gender + '</td>';
                 strHtmlLit += '</tr>';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;">वय</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #4617B4;padding:5px;">' + row.Age + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">वय</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.Age + '</td>';
                 strHtmlLit += '</tr>';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;">ओळखपत्र क्रमांक</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #4617B4;padding:5px;">' + row.IdCard + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">ओळखपत्र क्रमांक</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.IdCard + '</td>';
                 strHtmlLit += '</tr>';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;">घर क्रमांक</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #4617B4;padding:5px;">' + row.HouseNo + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">घर क्रमांक</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.HouseNo + '</td>';
                 strHtmlLit += '</tr>';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;">मतदान केंद्र</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #4617B4;padding:5px;">' + row.PsName + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">मतदान केंद्र</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.PsName + '</td>';
                 strHtmlLit += '</tr>';
 
-                if (row.SrlNo) {
-                    strHtmlLit += '<tr>';
-                    strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">अनुक्रमांक</td>';
-                    strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.SrlNo + '</td>';
-                    strHtmlLit += '</tr>';
-                }
+                strHtmlLit += '<tr>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">अनुक्रमांक</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.Srlno + '</td>';
+                strHtmlLit += '</tr>';
 
                 strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #4617B4;padding:5px;width:40%;">भाग</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #4617B4;padding:5px;">' + row.PsLocation + '</td>';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">भाग</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.PsLocation + '</td>';
                 strHtmlLit += '</tr>';
 
                 if (row.HouseNo) {
                     strHtmlLit += '<tr>';
                     strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;" colspan="2">';
-                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="showFamily(\'' + row.HouseNo + '\')">कुटुंब पाहा<span>';
+                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="showFamily(\'' + row.HouseNo + '\',\'' + row.RlnName + '\')">कुटुंब पाहा<span>';
                     strHtmlLit += '</tr>';
                 }
 
@@ -671,6 +767,8 @@ function SetPaging(recordsPerPage, getCount, vPageNo, searchType) {
 
         $("#lblPageNo").text("Page # " + vPageNo);
 
+        
+
     } catch (e) {
         showMessage("Calculate Paging Error : " + JSON.stringify(e));
     }
@@ -701,7 +799,7 @@ function PollingStations(partwiseContainer) {
 
                         str += '<tr>';
                         str += '<th style="border:solid 1px #999999;padding:5px;">Poling Station</th>';
-                        str += '<th style="border:solid 1px #999999;padding:5px;"Voters</th>';
+                        str += '<th style="border:solid 1px #999999;padding:5px;">Voters</th>';
                         str += '</tr>';
 
                         if (results.rows.length > 0) {
@@ -762,7 +860,7 @@ function SurnameListGroup(partwiseContainer) {
 
         var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
 
-        var sql = 'SELECT COUNT(LName) AS VoterCount, LName FROM Voters GROUP BY LName HAVING (VoterCount > 100) ORDER BY VoterCount, LName';
+        var sql = 'SELECT COUNT(LName) AS VoterCount, LName FROM Voters GROUP BY LName HAVING (VoterCount > 1000) ORDER BY VoterCount, LName';
 
         if (db) {
             db.transaction(function (tx) {
@@ -773,7 +871,7 @@ function SurnameListGroup(partwiseContainer) {
 
                         str += '<tr>';
                         str += '<th style="border:solid 1px #999999;padding:5px;">Surname</th>';
-                        str += '<th style="border:solid 1px #999999;padding:5px;"Voters</th>';
+                        str += '<th style="border:solid 1px #999999;padding:5px;">Voters</th>';
                         str += '</tr>';
 
                         if (results.rows.length > 0) {
@@ -837,25 +935,25 @@ function AgewiseeListGroup(partwiseContainer) {
 
         var sql = "";
 
-        sql += "SELECT COUNT(Age) AS VoterCount,'18 - 25' AS Range  FROM Voters WHERE Age BETWEEN 18 AND 25 ORDER BY VoterCount";
-        sql += " UNION SELECT COUNT(Age) AS VoterCount,'25 - 35' AS Range  FROM Voters WHERE Age BETWEEN 25 AND 35";
-        sql += " UNION SELECT COUNT(Age) AS VoterCount,'35 - 55' AS Range  FROM Voters WHERE Age BETWEEN 35 AND 55";
-        sql += " UNION SELECT COUNT(Age) AS VoterCount,'45 - 55' AS Range  FROM Voters WHERE Age BETWEEN 45 AND 55";
-        sql += " UNION SELECT COUNT(Age) AS VoterCount,'55 - 65' AS Range  FROM Voters WHERE Age BETWEEN 55 AND 65";
-        sql += " UNION SELECT COUNT(Age) AS VoterCount,'65 - 75' AS Range  FROM Voters WHERE Age BETWEEN 65 AND 75";
-        sql += " UNION SELECT COUNT(Age) AS VoterCount,'75 - 85' AS Range  FROM Voters WHERE Age BETWEEN 75 AND 85";
+        sql += "SELECT COUNT(Age) AS VoterCount,'18 - 25' AS Range  FROM Voters WHERE Age BETWEEN 18 AND 25";
+        sql += " UNION ALL SELECT COUNT(Age) AS VoterCount,'25 - 35' AS Range  FROM Voters WHERE Age BETWEEN 25 AND 35";
+        sql += " UNION ALL SELECT COUNT(Age) AS VoterCount,'35 - 55' AS Range  FROM Voters WHERE Age BETWEEN 35 AND 55";
+        sql += " UNION ALL SELECT COUNT(Age) AS VoterCount,'45 - 55' AS Range  FROM Voters WHERE Age BETWEEN 45 AND 55";
+        sql += " UNION ALL SELECT COUNT(Age) AS VoterCount,'55 - 65' AS Range  FROM Voters WHERE Age BETWEEN 55 AND 65";
+        sql += " UNION ALL SELECT COUNT(Age) AS VoterCount,'65 - 75' AS Range  FROM Voters WHERE Age BETWEEN 65 AND 75";
+        sql += " UNION ALL SELECT COUNT(Age) AS VoterCount,'75 - 85' AS Range  FROM Voters WHERE Age BETWEEN 75 AND 85";
         sql += " UNION SELECT COUNT(Age) AS VoterCount,'85 - 100' AS Range  FROM Voters WHERE Age BETWEEN 85 AND 100;";
 
         if (db) {
             db.transaction(function (tx) {
 
                 try {
-                    tx.cuteSql(sql, [], function (tx, results) {
+                    tx.executeSql(sql, [], function (tx, results) {
                         var str = '<table style="width:100%;border-collapse:collapse;border:solid 1px #999999;">';
 
                         str += '<tr>';
                         str += '<th style="border:solid 1px #999999;padding:5px;">Age(s)</th>';
-                        str += '<th style="border:solid 1px #999999;padding:5px;"Voters</th>';
+                        str += '<th style="border:solid 1px #999999;padding:5px;">Voters</th>';
                         str += '</tr>';
 
                         if (results.rows.length > 0) {
@@ -901,13 +999,15 @@ function AgewiseeListGroup(partwiseContainer) {
     }
 }
 
-function showFamily(houseNumber) {
+function showFamily(houseNumber,surName) {
     try {
+        
         if (houseNumber != '') {
             nameSearchHolder.VPartNo = 0;
             nameSearchHolder.VName = houseNumber
             nameSearchHolder.VPageNo = 1;
             nameSearchHolder.VAction = 4;
+            nameSearchHolder.VHouseSurName = surName;
 
             $.mobile.changePage("#nameSearchResult", {
                 transition: "slide",

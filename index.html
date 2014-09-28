@@ -13,10 +13,12 @@
     <script type="text/javascript" src="phonegap.js"></script>
     <link rel="stylesheet" href="css/app.css" type="text/css">
     <script type="text/javascript">
+        
+        var configurations = { FileCount: 550, PageSize: 50 };
 
-        var configurations = { FileCount: 20, PageSize: 50 };
+        var nameSearchHolder = { VPartNo: 0, VName: '', VPageNo: 1, VAction: 0, VHouseSurName: '' };
 
-        var nameSearchHolder = { VPartNo: 0, VName: '', VPageNo: 1, VAction: 0 };
+        var fullNameSearchHolder = { VPartNo: 0, VFirstName: '', VMiddleName: '', VLastName: '', VPageNo: 1, VAction: 0 };
 
         document.addEventListener("deviceReady", deviceReady, false);
 
@@ -28,8 +30,12 @@
             }
         }
 
+        $(document).delegate("#UpdateDb", "pageshow", function () {
+            StartUpdatingApp();
+        });
+
         $(document).delegate("#NameSearch", "pageshow", function () {
-            fillPartDropdown('ddlNameSearchPartNo');
+            fillPartDropdown('ddlFullNameSearchPartNo');
         });
 
         $(document).delegate("#SurnameSarch", "pageshow", function () {
@@ -290,11 +296,10 @@
             <p>
                 It may take several minutes to accomplish updations, (Usualy 15-20 minutes but still
                 depends upon on your device processing speed)</p>
-            <a href="#" data-role="button" data-inline="true" data-theme="d" id="btnUpdateButton"
-                onclick="StartUpdatingApp();">Click to Start Updating Application</a>
+            
             <div id="progressBar" style="display: none;">
                 <p style="padding: 10px;">
-                    <meter id="meter" value="0" min="0" max="100" high="80" low="40"></meter>
+                    <meter id="meter" value="0" min="0" max="550" high="400" low="200"></meter>
                 </p>
                 <p id="logger" style="border: solid 1px silver; padding: 2px;">
                 </p>
@@ -318,19 +323,29 @@
             <h3>
                 Search Voter By Name</h3>
             <div data-role="fieldcontain" class="ui-hide-label">
-                <label for="ddlNameSearchPartNo" class="select">
+                <label for="ddlFullNameSearchPartNo" class="select">
                     Select Part:</label>
-                <select name="ddlNameSearchPartNo" id="ddlNameSearchPartNo" data-theme="c">
+                <select name="ddlFullNameSearchPartNo" id="ddlFullNameSearchPartNo" data-theme="c">
                 </select>
             </div>
             <div data-role="fieldcontain" class="ui-hide-label">
-                <label for="txtNameSearchVoterName" class="select">
+                <label for="txtFullNameSearchVoterName" class="select">
                     Voter Name:</label>
-                <input type="text" name="txtNameSearchVoterName" id="txtNameSearchVoterName" placeholder="Voter Name" />
+                <input type="text" name="txtFullNameSearchVoterName" id="txtFullNameSearchVoterName" placeholder="Voter's Name" />
+            </div>
+             <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtFullNameSearchMiddleName" class="select">
+                    Voter Last Name:</label>
+                <input type="text" name="txtFullNameSearchMiddleName" id="txtFullNameSearchMiddleName" placeholder="Voter's Father Name" />
+            </div>
+             <div data-role="fieldcontain" class="ui-hide-label">
+                <label for="txtFullNameSearchLastName" class="select">
+                    Voter Last Name:</label>
+                <input type="text" name="txtFullNameSearchLastName" id="txtFullNameSearchLastName" placeholder="Voter's Surname" />
             </div>
             <div data-role="fieldcontain" class="ui-hide-label">
-                <a href="#" class="ui-btn data" id="btnNameSearchSubmit" name="btnNameSearchSubmit"
-                    onclick="PerformSearch(1);">Search</a>
+                <a href="#" class="ui-btn data" id="btnNameSearchSubmit" name="btnFullNameSearchSubmit"
+                    onclick="PerformSearch(7);">Search</a>
             </div>
         </div>
         <div data-role="footer" data-position="fixed">
