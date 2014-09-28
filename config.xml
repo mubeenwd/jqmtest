@@ -3,10 +3,10 @@
 <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id        = "com.mubeen.jqmtest"
+        id        = "com.mubeen.jqmtest.sillod"
         version   = "1.0.0">
 
-    <name>Sarkar2104</name>
+    <name>Sarkar2104 - B</name>
 
     <description>
       Application for Sarkar Vidhansabha Election 2014
