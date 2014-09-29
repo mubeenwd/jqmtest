@@ -22,11 +22,12 @@ function CheckDbStatus() {
 
         db.transaction(function (tx) {
             tx.executeSql('CREATE TABLE IF NOT EXISTS Voters (VoterId integer primary key, PartNo integer,Srlno integer,Mname text,Ename text,Fname text,RlnName text,LName text,IdCard text,Age text,HouseNo text,Gender text,PsName text,PsLocation text)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PsLocation text)');
 
             tx.executeSql("SELECT count(VoterId) as cnt FROM Voters;", [], function (tx, res) {
                 if (res.rows.length > 0) {
                     if (res.rows.item(0).cnt > 1) {
-                        
+
                         $('div[data-role="content"]').waitMe('hide');
                     }
                     else {
@@ -83,7 +84,9 @@ function ReadLocaFiles(FileNo) {
                                     ReadLocaFiles(parseInt(FileNo) + 1);
                                 }
                                 else {
-
+                                    
+                                    updateParts();
+                                    
                                     showMessage("Application has been updated successfully!");
 
                                     $.mobile.changePage("#home", {
@@ -112,6 +115,15 @@ function ReadLocaFiles(FileNo) {
         });
     } catch (e) {
         showMessage("ReadLocaFiles Error " + JSON.stringify(e));
+    }
+}
+
+function updateParts() {
+    try {
+        //tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PsLocation text)');
+
+    } catch (e) {
+
     }
 }
 
@@ -494,7 +506,7 @@ function BuildSearchResult(VPageNo) {
             
             if (fullNameSearchHolder.VPartNo != '') {
                 if (parseInt(fullNameSearchHolder.VPartNo) > 0) {
-                    strCondition += " WHERE PartNo = '" + fullNameSearchHolder.VPartNo + "'";
+                    strCondition += " WHERE PartNo = '" + fullNameSearchHolder.VPartNo + "' AND ";
                 }
                 else {
                     strCondition += " WHERE ";
@@ -504,27 +516,26 @@ function BuildSearchResult(VPageNo) {
                 strCondition += " WHERE ";
             }
 
+            
             if (fullNameSearchHolder.VFirstName != '') {
-                strCondition += "Fname like '%" + fullNameSearchHolder.VFirstName + "%' AND ";
+                strCondition += "Fname like '%" + fullNameSearchHolder.VFirstName + "%'";
             }
 
             if (fullNameSearchHolder.VMiddleName != '') {
-                strCondition += "RlnName like '%" + fullNameSearchHolder.VMiddleName + "%' AND ";
-            }
-            else {
-                if (fullNameSearchHolder.VFirstName!='') {
-                    strCondition = strCondition.substring(0, strCondition.length - 5);
+                if (fullNameSearchHolder.VFirstName != '') {
+                    strCondition += " AND RlnName like '%" + fullNameSearchHolder.VMiddleName + "%'";
+                }
+                else {
+                    strCondition += " RlnName like '%" + fullNameSearchHolder.VMiddleName + "%'";
                 }
             }
 
             if (fullNameSearchHolder.VLastName != '') {
-                strCondition += "Lname like '%" + fullNameSearchHolder.VLastName + "%' ";
-            }
-            else {
-                if (fullNameSearchHolder.VFirstName != '') {
-                    if (fullNameSearchHolder.VMiddleName != '') {
-                        strCondition = strCondition.substring(0, strCondition.length - 5);
-                    }
+                if (fullNameSearchHolder.VMiddleName + fullNameSearchHolder.VFirstName != '') {
+                    strCondition += "AND LName like '%" + fullNameSearchHolder.VLastName + "%'";
+                }
+                else {
+                    strCondition += " LName like '%" + fullNameSearchHolder.VLastName + "%'";
                 }
             }
 
