@@ -6,7 +6,7 @@
         id        = "com.mubeen.jqmtest.sillod"
         version   = "1.0.0">
 
-    <name>Sarkar2104 - B</name>
+    <name>Sarkar 2014</name>
 
     <description>
       Application for Sarkar Vidhansabha Election 2014
@@ -72,19 +72,19 @@
 
     <!-- Define app icon for each platform. -->
     <icon src="icon.png" />
-    <icon src="res/icon/android/icon-36-ldpi.png"   gap:platform="android"    gap:qualifier="ldpi" />
-    <icon src="res/icon/android/icon-48-mdpi.png"   gap:platform="android"    gap:qualifier="mdpi" />
-    <icon src="res/icon/android/icon-72-hdpi.png"   gap:platform="android"    gap:qualifier="hdpi" />
-    <icon src="res/icon/android/icon-96-xhdpi.png"  gap:platform="android"    gap:qualifier="xhdpi" />
+    <icon src="icon.png"   gap:platform="android"    gap:qualifier="ldpi" />
+    <icon src="icon.png"   gap:platform="android"    gap:qualifier="mdpi" />
+    <icon src="icon.png"   gap:platform="android"    gap:qualifier="hdpi" />
+    <icon src="icon.png"  gap:platform="android"    gap:qualifier="xhdpi" />
     
-  
+    
     <!-- Define app splash screen for each platform. -->
     <gap:splash src="splash.png"       gap:platform="android" gap:qualifier="port-ldpi" />
     <gap:splash src="splash.png"       gap:platform="android" gap:qualifier="port-mdpi" />
     <gap:splash src="splash.png"       gap:platform="android" gap:qualifier="port-hdpi" />
     <gap:splash src="splash.png"      gap:platform="android" gap:qualifier="port-xhdpi" />
     
-  
+    
     <gap:config-file platform="ios" parent="CFBundleShortVersionString">
     <string>100</string>
     </gap:config-file>
