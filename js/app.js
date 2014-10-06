@@ -22,9 +22,10 @@ function CheckDbStatus() {
 
         db.transaction(function (tx) {
             tx.executeSql('CREATE TABLE IF NOT EXISTS Voters (VoterId integer primary key, PartNo integer,Srlno integer,Mname text,Ename text,Fname text,RlnName text,LName text,IdCard text,Age text,HouseNo text,Gender text,PsName text,PsLocation text)');
-            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PsLocation text)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PartName text,Voters integer)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctBooth (BoothNo integer primary key, BoothName text,Voters integer)');
 
-            tx.executeSql("SELECT count(VoterId) as cnt FROM Voters;", [], function (tx, res) {
+            tx.executeSql("SELECT count(PartNo) as cnt FROM DistinctPart;", [], function (tx, res) {
                 if (res.rows.length > 0) {
                     if (res.rows.item(0).cnt > 1) {
 
@@ -85,8 +86,6 @@ function ReadLocaFiles(FileNo) {
                                 }
                                 else {
                                     
-                                    updateParts();
-                                    
                                     showMessage("Application has been updated successfully!");
 
                                     $.mobile.changePage("#home", {
@@ -96,7 +95,21 @@ function ReadLocaFiles(FileNo) {
                                     });
                                 }
                             }, function (e) {
-                                showMessage("tx.executeSql ERROR: " + JSON.stringify(e));
+                                if (FileNo < configurations.FileCount) {
+                                    $("#meter").val(FileNo);
+                                    $("#logger").html('<span style="padding:5px;color:008A00;">' + FileNo + ' of ' + configurations.FileCount + ' files(s) has been updated').fadeIn('slow');
+                                    ReadLocaFiles(parseInt(FileNo) + 1);
+                                }
+                                else {
+                                    
+                                    showMessage("Application has been updated successfully!");
+
+                                    $.mobile.changePage("#home", {
+                                        transition: "slide",
+                                        reverse: true,
+                                        changeHash: true
+                                    });
+                                }
                             });
                         } catch (e) {
                             showMessage("db.executeSql catch block ERROR: " + JSON.stringify(e));
@@ -141,7 +154,7 @@ function fillPartDropdown(dropdownName) {
         try {
             var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
 
-            var sql = 'SELECT DISTINCT PsLocation AS TextField,PartNo AS ValueField FROM Voters;';
+            var sql = 'SELECT PartName AS TextField,PartNo AS ValueField FROM DistinctPart;';
 
             if (db) {
                 db.transaction(function (tx) {
@@ -207,7 +220,7 @@ function PartwiseGroupByList(partwiseContainer) {
 
         var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
 
-        var sql = 'SELECT COUNT(PartNo) AS VoterCount, PsLocation FROM Voters GROUP BY PartNo, PsLocation HAVING (VoterCount > 100) ORDER BY PartNo, PsLocation';
+        var sql = 'SELECT PartNo,PartName,Voters from DistinctPart';
 
         if (db) {
             db.transaction(function (tx) {
@@ -217,6 +230,7 @@ function PartwiseGroupByList(partwiseContainer) {
                         var str = '<table style="width:100%;border-collapse:collapse;border:solid 1px #999999;">';
 
                         str += '<tr>';
+                        str += '<th style="border:solid 1px #999999;padding:5px;">Sr</th>';
                         str += '<th style="border:solid 1px #999999;padding:5px;">Part Name</th>';
                         str += '<th style="border:solid 1px #999999;padding:5px;"Voters</th>';
                         str += '</tr>';
@@ -225,8 +239,9 @@ function PartwiseGroupByList(partwiseContainer) {
                             for (var i = 0; i < results.rows.length; i++) {
                                 row = results.rows.item(i);
                                 str += '<tr>';
-                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.PsLocation + '</td>';
-                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.VoterCount + '</td>';
+                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.PartNo + '</td>';
+                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.PartName + '</td>';
+                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.Voters + '</td>';
                                 str += '</tr>';
                             }
 
@@ -799,7 +814,7 @@ function PollingStations(partwiseContainer) {
 
         var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
 
-        var sql = 'SELECT COUNT(PsName) AS VoterCount, PsName FROM Voters GROUP BY PsName HAVING (VoterCount > 100) ORDER BY VoterCount desc';
+        var sql = 'SELECT BoothNo,BoothName,Voters from DistinctBooth';
 
         if (db) {
             db.transaction(function (tx) {
@@ -809,6 +824,7 @@ function PollingStations(partwiseContainer) {
                         var str = '<table style="width:100%;border-collapse:collapse;border:solid 1px #999999;">';
 
                         str += '<tr>';
+                        str += '<th style="border:solid 1px #999999;padding:5px;">Sr</th>';
                         str += '<th style="border:solid 1px #999999;padding:5px;">Poling Station</th>';
                         str += '<th style="border:solid 1px #999999;padding:5px;">Voters</th>';
                         str += '</tr>';
@@ -817,8 +833,9 @@ function PollingStations(partwiseContainer) {
                             for (var i = 0; i < results.rows.length; i++) {
                                 row = results.rows.item(i);
                                 str += '<tr>';
-                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.PsName + '</td>';
-                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.VoterCount + '</td>';
+                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.BoothNo + '</td>';
+                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.BoothName + '</td>';
+                                str += '<td style="border:solid 1px #999999;padding:5px;">' + row.Voters + '</td>';
                                 str += '</tr>';
                             }
 
