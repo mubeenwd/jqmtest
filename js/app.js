@@ -95,6 +95,7 @@ function ReadLocaFiles(FileNo) {
                                     });
                                 }
                             }, function (e) {
+                                
                                 if (FileNo < configurations.FileCount) {
                                     $("#meter").val(FileNo);
                                     $("#logger").html('<span style="padding:5px;color:008A00;">' + FileNo + ' of ' + configurations.FileCount + ' files(s) has been updated').fadeIn('slow');
