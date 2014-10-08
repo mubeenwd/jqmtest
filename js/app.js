@@ -726,8 +726,19 @@ function FillList(results) {
 
                 if (row.HouseNo) {
                     strHtmlLit += '<tr>';
-                    strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;" colspan="2">';
+                    strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;">';
                     strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="showFamily(\'' + row.HouseNo + '\',\'' + row.RlnName + '\')">कुटुंब पाहा<span>';
+                    strHtmlLit += '</td>';
+                    strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;">';
+                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="sendSms(' + row + ')">संदेश पाठवा<span>';
+                    strHtmlLit += '</td>';
+                    strHtmlLit += '</tr>';
+                }
+                else {
+                    strHtmlLit += '<tr>';
+                    strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;" colspan="2">';
+                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="sendSms(' + row + ')">संदेश पाठवा<span>';
+                    strHtmlLit += '</td>';
                     strHtmlLit += '</tr>';
                 }
 
@@ -741,6 +752,25 @@ function FillList(results) {
         else {
             $("#nameSearchResultContainer").html('<p style="color:red;">No result found for your search, Please try again with diffrent search</p>');
         }
+    } catch (e) {
+        showMessage(e.Message);
+    }
+}
+
+function sendSms(row) {
+    try {
+        var strMessage = '';
+        strMessage += 'ओळखपत्र क्रमांक: ' + row.IdCard + '\n\r';
+        strMessage += 'नाव: ' + row.Mname + '\n\r';
+        strMessage += 'लिंग: ' + row.Gender + '\n\r';
+        strMessage += 'वय: ' + row.Age + '\n\r';
+        if (row.HouseNo) {
+            strMessage += 'घर क्रमांक: ' + row.HouseNo + '\n\r';
+        }
+        strMessage += 'मतदान केंद्र: ' + row.PsName + '\n\r';
+        strMessage += 'अनुक्रमांक: ' + row.Srlno + '\n\r';
+        strMessage += 'भाग: ' + row.PsLocation + '\n\r';
+        window.plugins.socialsharing.share(strMessage);
     } catch (e) {
         showMessage(e.Message);
     }
