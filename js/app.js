@@ -157,7 +157,7 @@ function fillPartDropdown(dropdownName) {
         try {
             var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
 
-            var sql = 'SELECT PartName AS TextField,PartNo AS ValueField FROM DistinctPart;';
+            var sql = 'SELECT PartName AS TextField,PartNo AS ValueField FROM DistinctPart b;';
 
             if (db) {
                 db.transaction(function (tx) {
