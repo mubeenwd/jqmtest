@@ -19,16 +19,13 @@ function CheckDbStatus() {
         });
 
         var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
-
-        db.transaction(function (tx) {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS Voters (VoterId integer primary key, PartNo integer,Srlno integer,Mname text,Ename text,Fname text,RlnName text,LName text,IdCard text,Age text,HouseNo text,Gender text,PsName text,PsLocation text)');
+            
+        db.transaction(function (tx) {tx.executeSql('CREATE TABLE IF NOT EXISTS Voters (VoterId integer primary key, PartNo integer,Srlno integer,Mname text,Ename text,Fname text,RlnName text,LName text,IdCard text,Age text,HouseNo text,Gender text,PsName text,PsLocation text)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PartName text,Voters integer)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctBooth (BoothNo integer primary key, BoothName text,Voters integer)');
-
             tx.executeSql("SELECT count(PartNo) as cnt FROM DistinctPart;", [], function (tx, res) {
                 if (res.rows.length > 0) {
                     if (res.rows.item(0).cnt > 1) {
-
                         $('div[data-role="content"]').waitMe('hide');
                     }
                     else {
@@ -95,7 +92,9 @@ function ReadLocaFiles(FileNo) {
                                     });
                                 }
                             }, function (e) {
-                                
+
+                                showMessage("db.executeSql ERROR: " + JSON.stringify(e));
+
                                 if (FileNo < configurations.FileCount) {
                                     $("#meter").val(FileNo);
                                     $("#logger").html('<span style="padding:5px;color:008A00;">' + FileNo + ' of ' + configurations.FileCount + ' files(s) has been updated').fadeIn('slow');
@@ -532,7 +531,6 @@ function BuildSearchResult(VPageNo) {
                 strCondition += " WHERE ";
             }
 
-            
             if (fullNameSearchHolder.VFirstName != '') {
                 strCondition += "Fname like '%" + fullNameSearchHolder.VFirstName + "%'";
             }
@@ -683,45 +681,47 @@ function FillList(results) {
             for (var i = 0; i < results.rows.length; i++) {
                 row = results.rows.item(i);
 
-                strHtmlLit += '<table style="width:100%;border-collapse:collapse;border:solid 1px #999999;padding:2px;">';
+                strHtmlLit += '<table style="width:100%;border-collapse:collapse;border:solid 1px #999999;padding:2px;" data-sr-number="' + row.Srlno + '">';
 
-                strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;" colspan="2">' + row.Mname + '</td>';
+                strHtmlLit += '<tr class="dataRow">';
+                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;" colspan="2" data-header="नाव" class="dataContainerName">' + row.Mname + '</td>';
                 strHtmlLit += '</tr>';
 
-                strHtmlLit += '<tr>';
+                strHtmlLit += '<tr class="dataRow">';
                 strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">लिंग</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:2px;">' + row.Gender + '</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:2px;" data-header="लिंग" class="dataContainerGender">' + row.Gender + '</td>';
                 strHtmlLit += '</tr>';
 
-                strHtmlLit += '<tr>';
+                strHtmlLit += '<tr class="dataRow">';
                 strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">वय</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.Age + '</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;" data-header="वय" class="dataContainerAge">' + row.Age + '</td>';
                 strHtmlLit += '</tr>';
 
-                strHtmlLit += '<tr>';
+                strHtmlLit += '<tr class="dataRow">';
                 strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">ओळखपत्र क्रमांक</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.IdCard + '</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;" data-header="ओळखपत्र क्रमांक" class="dataContainerId">' + row.IdCard + '</td>';
                 strHtmlLit += '</tr>';
 
-                strHtmlLit += '<tr>';
-                strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">घर क्रमांक</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.HouseNo + '</td>';
-                strHtmlLit += '</tr>';
+                if (row.HouseNo) {
+                    strHtmlLit += '<tr class="dataRow">';
+                    strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">घर क्रमांक</td>';
+                    strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;" data-header="घर क्रमांक">' + row.HouseNo + '</td>';
+                    strHtmlLit += '</tr>';
+                }
 
-                strHtmlLit += '<tr>';
+                strHtmlLit += '<tr class="dataRow">';
                 strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">मतदान केंद्र</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.PsName + '</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;" data-header="मतदान केंद्र" class="dataContainerPsName">' + row.PsName + '</td>';
                 strHtmlLit += '</tr>';
 
-                strHtmlLit += '<tr>';
+                strHtmlLit += '<tr class="dataRow">';
                 strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">अनुक्रमांक</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.Srlno + '</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;" data-header="अनुक्रमांक" class="dataContainerSrNo">' + row.Srlno + '</td>';
                 strHtmlLit += '</tr>';
 
-                strHtmlLit += '<tr>';
+                strHtmlLit += '<tr class="dataRow">';
                 strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;width:40%;">भाग</td>';
-                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;">' + row.PsLocation + '</td>';
+                strHtmlLit += '<td style="font-weight:normal;border:solid 1px #999999;padding:5px;" data-header="भाग" class="dataContainerPsLocation" data-ps-number="' + row.PartNo + '">' + row.PsLocation + '</td>';
                 strHtmlLit += '</tr>';
 
                 if (row.HouseNo) {
@@ -730,14 +730,14 @@ function FillList(results) {
                     strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="showFamily(\'' + row.HouseNo + '\',\'' + row.RlnName + '\')">कुटुंब पाहा<span>';
                     strHtmlLit += '</td>';
                     strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;">';
-                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="sendSms(' + row + ')">संदेश पाठवा<span>';
+                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="sendSms(\'' + row.Srlno + '\')">संदेश पाठवा<span>';
                     strHtmlLit += '</td>';
                     strHtmlLit += '</tr>';
                 }
                 else {
                     strHtmlLit += '<tr>';
                     strHtmlLit += '<td style="font-weight:bold;border:solid 1px #999999;padding:5px;text-align:center;" colspan="2">';
-                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="sendSms(' + row + ')">संदेश पाठवा<span>';
+                    strHtmlLit += '<span style="color:#223264;padding:5px;margin:5px;background-color:#bcd7e5;font-size:16px;width:100%;" onclick="sendSms(\'' + row.Srlno + '\')">संदेश पाठवा<span>';
                     strHtmlLit += '</td>';
                     strHtmlLit += '</tr>';
                 }
@@ -757,19 +757,35 @@ function FillList(results) {
     }
 }
 
-function sendSms(row) {
+function sendSms(Srlno) {
     try {
+
         var strMessage = '';
-        strMessage += 'ओळखपत्र क्रमांक: ' + row.IdCard + '\n\r';
-        strMessage += 'नाव: ' + row.Mname + '\n\r';
-        strMessage += 'लिंग: ' + row.Gender + '\n\r';
-        strMessage += 'वय: ' + row.Age + '\n\r';
-        if (row.HouseNo) {
-            strMessage += 'घर क्रमांक: ' + row.HouseNo + '\n\r';
-        }
-        strMessage += 'मतदान केंद्र: ' + row.PsName + '\n\r';
-        strMessage += 'अनुक्रमांक: ' + row.Srlno + '\n\r';
-        strMessage += 'भाग: ' + row.PsLocation + '\n\r';
+        var dataContainerName = '';
+        var dataContainerGender = '';
+        var dataContainerAge = '';
+        var dataContainerId = '';
+        var dataContainerPsName = '';
+        var dataContainerSrNo = '';
+        var dataContainerPsLocation = '';
+
+        $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('.dataContainerName').html();
+
+        dataContainerName = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerName').html();
+        dataContainerGender = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerGender').html();
+        dataContainerAge = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerAge').html();
+        dataContainerId = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerId').html();
+        dataContainerPsName = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerPsName').html();
+        dataContainerSrNo = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerSrNo').html();
+        dataContainerPsLocation = $('table[data-sr-number="' + Srlno + '"] tr.dataRow').find('td.dataContainerPsLocation').attr('data-ps-number');
+
+        strMessage += 'अशोक जी. जाधव , निशानी : शिट्टी' + '\n\r';
+        strMessage += 'भाग.क्र: ' + dataContainerPsLocation + ' , अनु क्र :' + dataContainerSrNo + '\n\r';
+        strMessage += 'नाव :' + dataContainerName + '\n\r';
+        //strMessage += 'लिंग :' + dataContainerGender + ' , वय: ' + dataContainerAge + '\n\r';
+        strMessage += 'ओ.प.क्र :' + dataContainerId + '\n\r';
+        strMessage += 'म.कें :' + dataContainerPsName + '\n\r';
+
         window.plugins.socialsharing.share(strMessage);
     } catch (e) {
         showMessage(e.Message);
