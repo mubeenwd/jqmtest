@@ -19,10 +19,13 @@ function CheckDbStatus() {
         });
 
         var db = window.sqlitePlugin.openDatabase({ name: "sarkar.db" });
-            
-        db.transaction(function (tx) {tx.executeSql('CREATE TABLE IF NOT EXISTS Voters (VoterId integer primary key, PartNo integer,Srlno integer,Mname text,Ename text,Fname text,RlnName text,LName text,IdCard text,Age text,HouseNo text,Gender text,PsName text,PsLocation text)');
-            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PartName text,Voters integer)');
-            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctBooth (BoothNo integer primary key, BoothName text,Voters integer)');
+
+        db.transaction(function (tx) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS Voters (VoterId integer primary key, PartNo integer,Srlno integer,Mname text,Ename text,Fname text,RlnName text,LName text,IdCard text,Age text,HouseNo text,Gender text,PsName text,PsLocation text)');
+            //            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer primary key, PartName text,Voters integer)');
+            //            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctBooth (BoothNo integer primary key, BoothName text,Voters integer)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctPart (PartNo integer, PartName text,Voters integer)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS DistinctBooth (BoothNo integer, BoothName text,Voters integer)');
             tx.executeSql("SELECT count(PartNo) as cnt FROM DistinctPart;", [], function (tx, res) {
                 if (res.rows.length > 0) {
                     if (res.rows.item(0).cnt > 1) {
@@ -82,7 +85,7 @@ function ReadLocaFiles(FileNo) {
                                     ReadLocaFiles(parseInt(FileNo) + 1);
                                 }
                                 else {
-                                    
+
                                     showMessage("Application has been updated successfully!");
 
                                     $.mobile.changePage("#home", {
@@ -91,9 +94,9 @@ function ReadLocaFiles(FileNo) {
                                         changeHash: true
                                     });
                                 }
-                            }, function (e) {
+                            }, function (error) {
 
-                                showMessage("db.executeSql ERROR: " + JSON.stringify(e));
+                                showMessage("db.executeSql ERROR: " + error.message + ', FileNo: ' + FileNo);
 
                                 if (FileNo < configurations.FileCount) {
                                     $("#meter").val(FileNo);
@@ -101,7 +104,7 @@ function ReadLocaFiles(FileNo) {
                                     ReadLocaFiles(parseInt(FileNo) + 1);
                                 }
                                 else {
-                                    
+
                                     showMessage("Application has been updated successfully!");
 
                                     $.mobile.changePage("#home", {
